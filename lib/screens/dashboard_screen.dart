@@ -20,6 +20,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       "https://newqbitronics.org.in/WIFIVALVE8/wivalve8/cdevicelist.php?&customerid=";
   static const String linkLoraWan =
       "https://qbitronics.com/Lorawan24/motorlora/cdevicelist.php?&customerid=";
+  static const String link3phChangeover =
+      "https://newqbitronics.org.in/WIFICR/wicr/cdevicelist.php?&customerid=";
 
   late AnimationController _bgController;
   late AnimationController _floatController;
@@ -42,6 +44,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       'title': 'LoRa-WAN Valve Controller',
       'key': 'id_lora_valve',
       'url': linkLoraWan,
+    },
+    {
+      'title': '3-Phase Changeover Controller',
+      'key': 'id_3ph_changeover',
+      'url': link3phChangeover,
     },
   ];
 

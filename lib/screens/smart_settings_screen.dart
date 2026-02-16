@@ -17,6 +17,7 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
   final idValveController = TextEditingController();
   final loraMotorIdController = TextEditingController();
   final loraValveIdController = TextEditingController();
+  final id3phChangeoverController = TextEditingController();
 
   late AnimationController _bgController;
   late AnimationController _floatController;
@@ -46,7 +47,8 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
     id3phController.dispose();
     idValveController.dispose();
     loraMotorIdController.dispose();
-
+    loraValveIdController.dispose();
+    id3phChangeoverController.dispose();
     super.dispose();
   }
 
@@ -59,6 +61,9 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
       id3phController.text = prefs.getString('id_3ph') ?? '';
       idValveController.text = prefs.getString('id_valve') ?? '';
       loraMotorIdController.text = prefs.getString('id_lora_motor') ?? '';
+      loraValveIdController.text = prefs.getString('id_lora_valve') ?? '';
+      id3phChangeoverController.text =
+          prefs.getString('id_3ph_changeover') ?? '';
     });
   }
 
@@ -94,6 +99,8 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
     await prefs.remove('id_3ph');
     await prefs.remove('id_valve');
     await prefs.remove('id_lora_motor');
+    await prefs.remove('id_lora_valve');
+    await prefs.remove('id_3ph_changeover');
 
     setState(() {
       id1phController.clear();
@@ -101,6 +108,7 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
       idValveController.clear();
       loraMotorIdController.clear();
       loraValveIdController.clear();
+      id3phChangeoverController.clear();
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -378,6 +386,18 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
                       "LORA-WAN MOTOR ID",
                       loraMotorIdController,
                       'id_lora_motor',
+                    ),
+                    const SizedBox(height: 16),
+                    fieldWithSave(
+                      "LORA-WAN VALVE ID",
+                      loraValveIdController,
+                      'id_lora_valve',
+                    ),
+                    const SizedBox(height: 16),
+                    fieldWithSave(
+                      "3-Phase Changeover ID",
+                      id3phChangeoverController,
+                      'id_3ph_changeover',
                     ),
 
                     const SizedBox(height: 30),

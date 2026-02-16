@@ -41,90 +41,52 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   }
 
   Widget glassButton(String text, IconData icon, VoidCallback onTap) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 1.0, end: 1.0),
-      duration: const Duration(milliseconds: 120),
-      builder: (context, scale, child) {
-        return Transform.scale(scale: scale, child: child);
-      },
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          splashColor: const Color(0xFF4ECDC4).withOpacity(0.25),
-          onTap: onTap,
-          onHighlightChanged: (pressed) {
-            // rebuild scale animation
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            child: Stack(
-              children: [
-                // 🌈 Gradient Border
-                Container(
-                  padding: const EdgeInsets.all(1.5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4ECDC4), Color(0xFF3A7BD5)],
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 18,
-                      horizontal: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      color: const Color(0xFF1E3A4C).withOpacity(0.65),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF4ECDC4).withOpacity(0.25),
-                          blurRadius: 12,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 44,
-                            child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF4ECDC4,
-                                  ).withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  icon,
-                                  color: const Color(0xFF4ECDC4),
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            text,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              letterSpacing: 0.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        splashColor: const Color(0xFF4ECDC4).withOpacity(0.3),
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFF1E3A4C).withOpacity(0.6),
+            border: Border.all(
+              color: const Color(0xFF4ECDC4).withOpacity(0.3),
+              width: 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4ECDC4).withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4ECDC4).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: const Color(0xFF4ECDC4), size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -236,6 +198,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       body: Stack(
         children: [
           animatedBackground(),
+
           floatingOrbs(),
           iconDecoration(),
           SafeArea(
@@ -282,7 +245,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.015), // Reduced spacing
+                  SizedBox(height: screenHeight * 0.035), // Reduced spacing
 
                   glassButton(
                     "Login",
