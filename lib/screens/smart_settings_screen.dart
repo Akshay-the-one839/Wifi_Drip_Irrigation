@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'menu_screen.dart';
 import 'dart:math' as math;
+import 'device_token_screen.dart';
 
 class SmartSettingsScreen extends StatefulWidget {
   const SmartSettingsScreen({super.key});
@@ -86,10 +87,11 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
     ).showSnackBar(const SnackBar(content: Text("Saved successfully")));
 
     // Navigate to MenuScreen after saving
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MenuScreen()),
-    );
+   Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (_) => const DeviceTokenScreen()),
+);
+
   }
 
   Future<void> clearAllIDs() async {

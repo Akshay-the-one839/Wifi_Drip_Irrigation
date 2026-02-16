@@ -7,6 +7,7 @@ import 'screens/smart_settings_screen.dart';
 import 'screens/contact_us_screen.dart';
 import 'screens/web_page.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/device_token_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
         '/smart': (context) => SmartSettingsScreen(),
         '/contact': (_) => ContactUsScreen(),
         '/dashboard': (context) => DashboardScreen(),
+        '/device-token': (context) => DeviceTokenScreen(),
+
       },
     );
   }
