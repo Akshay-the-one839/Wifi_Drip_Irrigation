@@ -4,6 +4,9 @@ import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 
 import 'dashboard_screen.dart'; // change if your home screen name is different
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import '../background_task.dart';
+import '../utils/motor_state_manager.dart';
 
 class DeviceTokenScreen extends StatefulWidget {
   const DeviceTokenScreen({super.key});
@@ -46,76 +49,33 @@ class _DeviceTokenScreenState extends State<DeviceTokenScreen>
 
   // ---------- SAVE + API ----------
 
-  Future<void> saveAndSend() async {
-    if (deviceIdController.text.trim().isEmpty ||
-        tokenIdController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("All fields are required")),
-      );
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-
-    // Save locally
-    await prefs.setString('device_id', deviceIdController.text.trim());
-    await prefs.setString('token_id', tokenIdController.text.trim());
-
-    // Call API in background (do not await)
-    sendToServer(
-      deviceIdController.text.trim(),
-      tokenIdController.text.trim(),
+ Future<void> saveAndSend() async {
+  if (deviceIdController.text.trim().isEmpty ||
+      tokenIdController.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("All fields are required")),
     );
-
-    // Go to Dashboard / Home
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const DashboardScreen()),
-    );
-  }
-
- Future<void> sendToServer(
-  String deviceId,
-  String tokenId,
-) async {
-  final prefs = await SharedPreferences.getInstance();
-
-  // Get customer IDs
-  final loraMotor = prefs.getString('id_lora_motor');
-  final valve = prefs.getString('id_valve');
-  final onePh = prefs.getString('id_1ph');
-  final threePh = prefs.getString('id_3ph');
-
-  // Decide which customer ID to use
-  String customerId = '';
-
-  if (loraMotor != null && loraMotor.isNotEmpty) {
-    customerId = loraMotor;
-  } else if (valve != null && valve.isNotEmpty) {
-    customerId = valve;
-  } else if (threePh != null && threePh.isNotEmpty) {
-    customerId = threePh;
-  } else if (onePh != null && onePh.isNotEmpty) {
-    customerId = onePh;
-  } else {
-    debugPrint("No customer ID found");
     return;
   }
 
-  // Build dynamic URL
-  final url = Uri.parse(
-    "https://newqbitronics.org.in/motorpro/motorvoltvpro/sample.php"
-    "?deviceid=$deviceId"
-    "&tokenid=$tokenId"
-    "&customerid=$customerId",
+  final prefs = await SharedPreferences.getInstance();
+
+  // 1️⃣ SAVE DATA
+  await prefs.setString('deviceId', deviceIdController.text.trim());
+  await prefs.setString('tokenId', tokenIdController.text.trim());
+
+  // 2️⃣ START FOREGROUND SERVICE  🔥🔥🔥 (THIS IS "WHERE")
+  await FlutterForegroundTask.startService(
+    notificationTitle: 'WiFi Drip Irrigation',
+    notificationText: 'Device running in background',
+    callback: startCallback,
   );
 
-  try {
-    await http.get(url); // GET request
-    debugPrint("API called: $url");
-  } catch (e) {
-    debugPrint("API error: $e");
-  }
+  // 3️⃣ NAVIGATE HOME
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const DashboardScreen()),
+  );
 }
 
 
@@ -245,6 +205,54 @@ class _DeviceTokenScreenState extends State<DeviceTokenScreen>
     );
   }
 
+  Widget _buildMotorStatusWidget() {
+    return FutureBuilder<String>(
+      future: _getDeviceId(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        
+        final deviceId = snapshot.data!;
+        return FutureBuilder<String>(
+          future: MotorStateManager.getStateChangeMessage(deviceId),
+          builder: (context, stateSnapshot) {
+            if (!stateSnapshot.hasData) {
+              return const SizedBox.shrink();
+            }
+            
+            final message = stateSnapshot.data!;
+            return Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E3A4C).withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF4ECDC4).withOpacity(0.5),
+                  width: 1.5,
+                ),
+              ),
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Color(0xFF4ECDC4),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<String> _getDeviceId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('deviceId') ?? '';
+  }
+
   // ---------- BUILD ----------
 
   @override
@@ -281,6 +289,8 @@ class _DeviceTokenScreenState extends State<DeviceTokenScreen>
                       hint: "Token ID",
                       controller: tokenIdController,
                     ),
+                    const SizedBox(height: 20),
+                    _buildMotorStatusWidget(),
                     const SizedBox(height: 30),
                     glowButton("SAVE & CONTINUE", saveAndSend),
                   ],
@@ -292,4 +302,7 @@ class _DeviceTokenScreenState extends State<DeviceTokenScreen>
       ),
     );
   }
+}
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(BackgroundTaskHandler());
 }

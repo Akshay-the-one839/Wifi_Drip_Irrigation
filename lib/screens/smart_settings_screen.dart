@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'menu_screen.dart';
 import 'dart:math' as math;
 import 'device_token_screen.dart';
+import '../background_task.dart';
 
 class SmartSettingsScreen extends StatefulWidget {
   const SmartSettingsScreen({super.key});
@@ -68,31 +70,33 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
     });
   }
 
-  Future<void> saveSingleID(
-    String key,
-    TextEditingController controller,
-  ) async {
-    if (controller.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Field cannot be empty")));
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, controller.text.trim());
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Saved successfully")));
-
-    // Navigate to MenuScreen after saving
-   Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(builder: (_) => const DeviceTokenScreen()),
-);
-
+Future<void> saveSingleID(
+  String key,
+  TextEditingController controller,
+) async {
+  if (controller.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Field cannot be empty")),
+    );
+    return;
   }
+
+  final prefs = await SharedPreferences.getInstance();
+
+  // 1️⃣ SAVE ID
+  await prefs.setString(key, controller.text.trim());
+
+  // 2️⃣ START FOREGROUND SERVICE (ADD HERE)
+  await FlutterForegroundTask.startService(
+    notificationTitle: 'WiFi Drip Irrigation',
+    notificationText: 'Background sync running',
+    callback: startCallback,
+  );
+
+  // 3️⃣ NAVIGATE
+  Navigator.pushReplacementNamed(context, '/device-token');
+}
+
 
   Future<void> clearAllIDs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -424,4 +428,7 @@ class _SmartSettingsScreenState extends State<SmartSettingsScreen>
       ),
     );
   }
+}
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(BackgroundTaskHandler());
 }

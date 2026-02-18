@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'screens/menu_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/login_screen.dart';
@@ -9,8 +9,14 @@ import 'screens/web_page.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/device_token_screen.dart';
 
+
+
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterForegroundTask.initCommunicationPort();
+  runApp(
+    MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
